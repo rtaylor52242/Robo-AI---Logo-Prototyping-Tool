@@ -6,6 +6,7 @@ import type { Tab, MockupOption, ImageData } from './types';
 import { ImageUpload } from './components/ImageUpload';
 import { GeneratedImageDisplay } from './components/GeneratedImageDisplay';
 import { ImageModal } from './components/ImageModal';
+import { HelpModal } from './components/HelpModal';
 
 // --- ICONS (as components) ---
 const TShirtIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-5h-5v5zM3 20h5v-5H3v5zm5-10H3l3-7h5l3 7H8zm13-7l3 7h-5l3-7h2zM8 10h8v10H8V10z" /></svg>;
@@ -23,6 +24,7 @@ const ShotGlassIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" cl
 const PhoneCaseIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4h6v6H4V4zm8 0h6v6h-6V4zm-8 8h6v6H4v-6zm8 8h6v6h-6v-6z" /></svg>;
 const SunIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
 const MoonIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>;
+const HelpIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 const DownloadIcon: React.FC<{className?: string}> = ({className = "h-5 w-5 mr-2"}) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -426,6 +428,7 @@ const ImageGenerator: React.FC = () => {
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('mockup');
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -460,39 +463,45 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen text-gray-900 dark:text-gray-100 font-sans p-4 sm:p-6 lg:p-8 transition-colors">
-      <main className="max-w-7xl mx-auto">
-        <header className="text-center mb-10 relative">
-          <div className="flex items-center justify-center gap-3">
-             <RobotIcon />
-             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-500 to-indigo-500 dark:from-purple-400 dark:to-indigo-400 text-transparent bg-clip-text">
-                Robo AI - Logo Prototyping Tool
-             </h1>
-          </div>
-          <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Your one-stop shop for AI-powered image creation and branding.</p>
-           <div className="absolute top-0 right-0">
-            <button onClick={toggleTheme} className="p-2 rounded-full bg-gray-200 dark:bg-dark-card hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors">
-              {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-            </button>
-          </div>
-        </header>
+    <>
+      <div className="min-h-screen text-gray-900 dark:text-gray-100 font-sans p-4 sm:p-6 lg:p-8 transition-colors">
+        <main className="max-w-7xl mx-auto">
+          <header className="text-center mb-10 relative">
+            <div className="flex items-center justify-center gap-3">
+               <RobotIcon />
+               <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-500 to-indigo-500 dark:from-purple-400 dark:to-indigo-400 text-transparent bg-clip-text">
+                  Robo AI - Logo Prototyping Tool
+               </h1>
+            </div>
+            <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Your one-stop shop for AI-powered image creation and branding.</p>
+             <div className="absolute top-0 right-0 flex items-center gap-2">
+                <button onClick={() => setIsHelpModalOpen(true)} className="p-2 rounded-full bg-gray-200 dark:bg-dark-card hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors" aria-label="Open help guide">
+                    <HelpIcon />
+                </button>
+                <button onClick={toggleTheme} className="p-2 rounded-full bg-gray-200 dark:bg-dark-card hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors" aria-label="Toggle theme">
+                    {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+                </button>
+            </div>
+          </header>
 
-        <div className="flex justify-center mb-8">
-          <div className="flex space-x-2 bg-white dark:bg-dark-card p-1 rounded-lg shadow-md dark:shadow-none transition-colors">
-            <TabButton tab="mockup" label="Logo on Mockup" />
-            <TabButton tab="editor" label="Image Editor" />
-            <TabButton tab="generator" label="Generate Image" />
+          <div className="flex justify-center mb-8">
+            <div className="flex space-x-2 bg-white dark:bg-dark-card p-1 rounded-lg shadow-md dark:shadow-none transition-colors">
+              <TabButton tab="mockup" label="Logo on Mockup" />
+              <TabButton tab="editor" label="Image Editor" />
+              <TabButton tab="generator" label="Generate Image" />
+            </div>
           </div>
-        </div>
 
-        <div className="bg-white dark:bg-dark-card p-6 sm:p-8 rounded-xl shadow-2xl transition-colors">
-          {renderContent()}
-        </div>
-      </main>
-      <footer className="text-center text-gray-500 dark:text-gray-500 mt-12 text-sm">
-        <p>Powered by Google Gemini. Built for creativity.</p>
-      </footer>
-    </div>
+          <div className="bg-white dark:bg-dark-card p-6 sm:p-8 rounded-xl shadow-2xl transition-colors">
+            {renderContent()}
+          </div>
+        </main>
+        <footer className="text-center text-gray-500 dark:text-gray-500 mt-12 text-sm">
+          <p>Powered by Google Gemini. Built for creativity.</p>
+        </footer>
+      </div>
+      <HelpModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
+    </>
   );
 };
 
