@@ -2,11 +2,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import JSZip from 'jszip';
 import { generateWithImageInput, generateWithTextInput } from './services/geminiService';
-import type { Tab, MockupOption, ImageData, MockupCategory } from './types';
+import type { Tab, MockupOption, ImageData, MockupCategory, HistoryItem } from './types';
 import { ImageUpload } from './components/ImageUpload';
 import { GeneratedImageDisplay } from './components/GeneratedImageDisplay';
 import { ImageModal } from './components/ImageModal';
 import { HelpModal } from './components/HelpModal';
+import { HistoryModal } from './components/HistoryModal';
 
 // --- ICONS (as components) ---
 const TShirtIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-5h-5v5zM3 20h5v-5H3v5zm5-10H3l3-7h5l3 7H8zm13-7l3 7h-5l3-7h2zM8 10h8v10H8V10z" /></svg>;
@@ -43,6 +44,7 @@ const PostcardIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" cla
 const SunIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
 const MoonIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>;
 const HelpIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const HistoryIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 const DownloadIcon: React.FC<{className?: string}> = ({className = "h-5 w-5 mr-2"}) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -61,6 +63,7 @@ const TransferIcon: React.FC = () => (
     <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
   </svg>
 );
+const LightBulbIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" /></svg>;
 
 
 // --- CONSTANTS ---
@@ -103,15 +106,69 @@ const MOCKUP_OPTIONS: MockupOption[] = [
 
 const CATEGORIES: MockupCategory[] = ['Apparel', 'Merchandise', 'Print', 'Signage'];
 
+const STYLE_PRESETS = [
+    'Abstract Art', 'Anime', 'Black and White', 'Claymation', 'Cyberpunk', 
+    'DC Comic', 'Futuristic Sci-Fi', 'Lego', 'Magical Fantasy', 'Marvel Comic', 
+    'Minecraft', 'Picasso', 'Pixar', 'Pop Art', 'Simpsons', 'Studio Ghibli', 
+    'Van Gogh', 'Vintage', 'Vintage Oil Painting', 'Watercolor'
+];
+
+const RANDOM_PROMPTS = [
+  "A futuristic city with flying cars and neon lights, cyberpunk style, high detail",
+  "A serene mountain landscape with a crystal clear lake at sunset, photorealistic",
+  "A cute robot gardening in a greenhouse full of exotic plants, Pixar style",
+  "An astronaut floating in space with Earth in the background, cinematic lighting",
+  "A magical library with floating books and glowing runes, fantasy art",
+  "A steampunk coffee shop with brass gears and steam pipes, warm atmosphere",
+  "A portrait of a cat wearing a victorian suit, oil painting style",
+  "A delicious gourmet burger with melting cheese and fresh vegetables, food photography",
+  "A dragon resting on a pile of gold coins in a dark cave, epic scale",
+  "A minimalist geometric logo design of a wolf, vector art style",
+  "A cozy cabin in the woods covered in snow, warm light coming from windows",
+  "An underwater city with bioluminescent creatures and coral reefs",
+  "A cyberpunk street food vendor serving glowing noodles",
+  "A vintage travel poster for Mars, retro style",
+  "A close-up macro shot of a dew drop on a spider web"
+];
+
+interface ErrorDetails {
+    message: string;
+    stack?: string;
+    details?: string;
+}
+
+const ErrorDisplay: React.FC<{ error: ErrorDetails | null }> = ({ error }) => {
+    if (!error) return null;
+    return (
+        <div className="mt-4 p-4 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 rounded-lg border border-red-200 dark:border-red-800">
+            <h4 className="font-bold flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                Something went wrong
+            </h4>
+            <p className="mt-1">{error.message}</p>
+            {(error.details || error.stack) && (
+                <details className="mt-2 text-xs font-mono whitespace-pre-wrap">
+                    <summary className="cursor-pointer hover:underline mb-1">Technical Details</summary>
+                    <div className="bg-white/50 dark:bg-black/20 p-2 rounded">
+                        {error.details || error.stack}
+                    </div>
+                </details>
+            )}
+        </div>
+    );
+};
 
 // --- FEATURE COMPONENTS ---
 
 interface MockupGeneratorProps {
   initialImage?: ImageData;
   onTransfer: (data: ImageData, target: Tab) => void;
+  onAddToHistory: (item: Omit<HistoryItem, 'id' | 'timestamp'>) => void;
 }
 
-const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTransfer }) => {
+const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTransfer, onAddToHistory }) => {
     const [logo, setLogo] = useState<ImageData | null>(initialImage || null);
     const [logoPreview, setLogoPreview] = useState<string | null>(initialImage ? `data:${initialImage.mimeType};base64,${initialImage.base64}` : null);
     const [selectedMockups, setSelectedMockups] = useState<MockupOption[]>([MOCKUP_OPTIONS[0]]);
@@ -120,7 +177,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
     const [isZipping, setIsZipping] = useState(false);
     const [isRemovingBg, setIsRemovingBg] = useState(false);
     const [isMirroring, setIsMirroring] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<ErrorDetails | null>(null);
     const [resultImages, setResultImages] = useState<{ id: string; src: string; name: string }[]>([]);
     const [modalStartIndex, setModalStartIndex] = useState<number | null>(null);
 
@@ -169,8 +226,9 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
             const newImageData = { base64: imageB64, mimeType: 'image/png' };
             setLogo(newImageData);
             setLogoPreview(`data:image/png;base64,${imageB64}`);
+            onAddToHistory({ imageData: newImageData, type: 'edit', prompt: 'Removed background' });
         } catch (err: any) {
-            setError(err.message || 'Failed to remove background.');
+            setError({ message: err.message || 'Failed to remove background.', stack: err.stack });
         } finally {
             setIsRemovingBg(false);
         }
@@ -209,9 +267,9 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
             const mirroredImageData = await promise;
             setLogo(mirroredImageData);
             setLogoPreview(`data:${mirroredImageData.mimeType};base64,${mirroredImageData.base64}`);
-
+             onAddToHistory({ imageData: mirroredImageData, type: 'edit', prompt: 'Mirrored image' });
         } catch (err: any) {
-            setError(err.message || 'Failed to mirror image.');
+            setError({ message: err.message || 'Failed to mirror image.', stack: err.stack });
         } finally {
             setIsMirroring(false);
         }
@@ -238,9 +296,9 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
 
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error creating zip file:", err);
-            setError("Could not create a zip file for download. Please try downloading images individually.");
+            setError({ message: "Could not create a zip file for download.", details: err.message, stack: err.stack });
         } finally {
             setIsZipping(false);
         }
@@ -249,11 +307,11 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!logo) {
-            setError('Please upload a logo first.');
+            setError({ message: 'Please upload a logo first.' });
             return;
         }
         if (selectedMockups.length === 0) {
-            setError('Please select at least one mockup type.');
+            setError({ message: 'Please select at least one mockup type.' });
             return;
         }
         setIsLoading(true);
@@ -272,12 +330,25 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
             .filter((res): res is { status: 'fulfilled'; value: string; id: string; name: string } => res.status === 'fulfilled')
             .map(res => ({ id: res.id, src: res.value, name: res.name }));
         
+        // Add successful mockups to history
+        successfulResults.forEach(res => {
+             onAddToHistory({ 
+                 imageData: { base64: res.src, mimeType: 'image/png' }, 
+                 type: 'mockup', 
+                 prompt: `Mockup: ${res.name}` 
+            });
+        });
+
         const failedResults = results.filter(res => res.status === 'rejected');
 
         setResultImages(successfulResults);
 
         if (failedResults.length > 0) {
-             setError(`Failed to generate ${failedResults.length} mockup(s): ${failedResults.map(r => r.name).join(', ')}. Please try again.`);
+             const errorDetails = failedResults.map(r => `${r.name}: ${(r as any).reason.message}`).join('\n');
+             setError({ 
+                 message: `Failed to generate ${failedResults.length} mockup(s).`,
+                 details: errorDetails
+             });
         }
 
         setIsLoading(false);
@@ -400,7 +471,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
                     </div>
                 </div>
             </div>
-            {error && <div className="text-red-700 dark:text-red-400 text-center mt-4 p-2 bg-red-100 dark:bg-red-900/50 rounded-md">{error}</div>}
+            <ErrorDisplay error={error} />
             {modalStartIndex !== null && <ImageModal images={resultImages} startIndex={modalStartIndex} onClose={() => setModalStartIndex(null)} />}
         </div>
     );
@@ -409,14 +480,15 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
 interface ImageEditorProps {
     initialImage?: ImageData;
     onTransfer: (data: ImageData, target: Tab) => void;
+    onAddToHistory: (item: Omit<HistoryItem, 'id' | 'timestamp'>) => void;
 }
 
-const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer }) => {
+const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onAddToHistory }) => {
     const [image, setImage] = useState<ImageData | null>(initialImage || null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(initialImage ? `data:${initialImage.mimeType};base64,${initialImage.base64}` : null);
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<ErrorDetails | null>(null);
     const [resultImage, setResultImage] = useState<string | null>(null);
 
     useEffect(() => {
@@ -430,11 +502,23 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer }) =
         setImage(imageData);
         setImagePreviewUrl(`data:${imageData.mimeType};base64,${imageData.base64}`);
     };
+    
+    const handleAddStyle = (style: string) => {
+        setPrompt(prev => {
+            const trimmed = prev.trim();
+            if (trimmed.length > 0 && !trimmed.endsWith('.')) {
+                return `${trimmed}. Make it ${style} style.`;
+            } else if (trimmed.length > 0) {
+                 return `${trimmed} Make it ${style} style.`;
+            }
+            return `Make this image ${style} style.`;
+        });
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!image || !prompt) {
-            setError('Please upload an image and enter an editing instruction.');
+            setError({ message: 'Please upload an image and enter an editing instruction.' });
             return;
         }
         setIsLoading(true);
@@ -444,8 +528,13 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer }) =
         try {
             const imageB64 = await generateWithImageInput(prompt, image);
             setResultImage(imageB64);
+            onAddToHistory({ 
+                imageData: { base64: imageB64, mimeType: 'image/png' }, 
+                type: 'edit', 
+                prompt: prompt 
+            });
         } catch (err: any) {
-            setError(err.message || 'An unknown error occurred.');
+            setError({ message: err.message || 'An unknown error occurred.', stack: err.stack });
         } finally {
             setIsLoading(false);
         }
@@ -470,6 +559,22 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer }) =
                         <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., 'Add a retro filter' or 'Make the sky look like a sunset'"
                             className="w-full h-24 p-2 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition"
                         />
+                         {/* Style Presets */}
+                         <div className="mt-4">
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Quick Styles</label>
+                            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                {STYLE_PRESETS.map(style => (
+                                    <button
+                                        key={style}
+                                        type="button"
+                                        onClick={() => handleAddStyle(style)}
+                                        className="px-2 py-1 text-xs bg-gray-200 dark:bg-dark-card hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded border border-transparent hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+                                    >
+                                        {style}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                     <button onClick={handleSubmit} disabled={isLoading || !image || !prompt} className="w-full bg-brand-primary hover:bg-brand-secondary text-white font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
                         {isLoading ? 'Editing...' : 'Apply Edit'}
@@ -488,25 +593,26 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer }) =
                     )}
                 </div>
             </div>
-            {error && <div className="text-red-700 dark:text-red-400 text-center mt-4 p-2 bg-red-100 dark:bg-red-900/50 rounded-md">{error}</div>}
+            <ErrorDisplay error={error} />
         </div>
     );
 };
 
 interface ImageGeneratorProps {
     onTransfer: (data: ImageData, target: Tab) => void;
+    onAddToHistory: (item: Omit<HistoryItem, 'id' | 'timestamp'>) => void;
 }
 
-const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onTransfer }) => {
+const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onTransfer, onAddToHistory }) => {
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<ErrorDetails | null>(null);
     const [resultImage, setResultImage] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!prompt) {
-            setError('Please enter a prompt to generate an image.');
+            setError({ message: 'Please enter a prompt to generate an image.' });
             return;
         }
         setIsLoading(true);
@@ -516,18 +622,38 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onTransfer }) => {
         try {
             const imageB64 = await generateWithTextInput(prompt);
             setResultImage(imageB64);
+             onAddToHistory({ 
+                imageData: { base64: imageB64, mimeType: 'image/png' }, 
+                type: 'generation', 
+                prompt: prompt 
+            });
         } catch (err: any) {
-            setError(err.message || 'An unknown error occurred.');
+            setError({ message: err.message || 'An unknown error occurred.', stack: err.stack });
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleInspireMe = () => {
+        const randomPrompt = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
+        setPrompt(randomPrompt);
     };
 
     return (
         <div className="space-y-8 max-w-3xl mx-auto">
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                    <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Describe the Image to Generate</h3>
+                    <div className="flex justify-between items-end mb-2">
+                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">1. Describe the Image to Generate</h3>
+                        <button
+                            type="button"
+                            onClick={handleInspireMe}
+                            className="text-sm flex items-center text-brand-primary hover:text-brand-secondary transition-colors"
+                        >
+                            <LightBulbIcon />
+                            Inspire Me
+                        </button>
+                    </div>
                     <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., 'A photorealistic image of a cat wearing a spacesuit, on the moon'"
                         className="w-full h-24 p-2 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition"
                     />
@@ -551,7 +677,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onTransfer }) => {
                     </div>
                 )}
             </div>
-            {error && <div className="text-red-700 dark:text-red-400 text-center mt-4 p-2 bg-red-100 dark:bg-red-900/50 rounded-md">{error}</div>}
+            <ErrorDisplay error={error} />
         </div>
     );
 };
@@ -562,9 +688,13 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('mockup');
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   
   // Shared state for image transfer between tabs
   const [sharedImage, setSharedImage] = useState<{data: ImageData, target: Tab} | null>(null);
+  
+  // History State
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -582,25 +712,14 @@ const App: React.FC = () => {
     // Scroll to top to ensure the user sees the input area
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'mockup': 
-        return <MockupGenerator 
-            initialImage={sharedImage?.target === 'mockup' ? sharedImage.data : undefined} 
-            onTransfer={handleTransfer} 
-        />;
-      case 'editor': 
-        return <ImageEditor 
-            initialImage={sharedImage?.target === 'editor' ? sharedImage.data : undefined} 
-            onTransfer={handleTransfer} 
-        />;
-      case 'generator': 
-        return <ImageGenerator 
-            onTransfer={handleTransfer} 
-        />;
-      default: return null;
-    }
+  
+  const addToHistory = (item: Omit<HistoryItem, 'id' | 'timestamp'>) => {
+      const newItem: HistoryItem = {
+          ...item,
+          id: Date.now().toString(),
+          timestamp: Date.now(),
+      };
+      setHistory(prev => [...prev, newItem]);
   };
 
   const TabButton = ({ tab, label }: { tab: Tab, label: string }) => (
@@ -629,6 +748,9 @@ const App: React.FC = () => {
             </div>
             <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Your one-stop shop for AI-powered image creation and branding.</p>
              <div className="absolute top-0 right-0 flex items-center gap-2">
+                 <button onClick={() => setIsHistoryModalOpen(true)} className="p-2 rounded-full bg-gray-200 dark:bg-dark-card hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors" aria-label="Open history">
+                    <HistoryIcon />
+                </button>
                 <button onClick={() => setIsHelpModalOpen(true)} className="p-2 rounded-full bg-gray-200 dark:bg-dark-card hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors" aria-label="Open help guide">
                     <HelpIcon />
                 </button>
@@ -647,7 +769,27 @@ const App: React.FC = () => {
           </div>
 
           <div className="bg-white dark:bg-dark-card p-6 sm:p-8 rounded-xl shadow-2xl transition-colors">
-            {renderContent()}
+             {/* Use hidden styling instead of conditional rendering to persist state */}
+            <div className={activeTab === 'mockup' ? 'block' : 'hidden'}>
+                 <MockupGenerator 
+                    initialImage={sharedImage?.target === 'mockup' ? sharedImage.data : undefined} 
+                    onTransfer={handleTransfer}
+                    onAddToHistory={addToHistory}
+                />
+            </div>
+             <div className={activeTab === 'editor' ? 'block' : 'hidden'}>
+                <ImageEditor 
+                    initialImage={sharedImage?.target === 'editor' ? sharedImage.data : undefined} 
+                    onTransfer={handleTransfer}
+                    onAddToHistory={addToHistory}
+                />
+            </div>
+             <div className={activeTab === 'generator' ? 'block' : 'hidden'}>
+                 <ImageGenerator 
+                    onTransfer={handleTransfer}
+                    onAddToHistory={addToHistory}
+                />
+            </div>
           </div>
         </main>
         <footer className="text-center text-gray-500 dark:text-gray-500 mt-12 text-sm">
@@ -655,6 +797,7 @@ const App: React.FC = () => {
         </footer>
       </div>
       <HelpModal isOpen={isHelpModalOpen} onClose={() => setIsHelpModalOpen(false)} />
+      <HistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} history={history} onTransfer={handleTransfer} />
     </>
   );
 };

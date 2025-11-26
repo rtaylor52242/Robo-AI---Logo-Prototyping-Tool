@@ -18,3 +18,11 @@ export interface ImageData {
   base64: string;
   mimeType: string;
 }
+
+export interface HistoryItem {
+  id: string;
+  timestamp: number;
+  imageData: ImageData;
+  type: 'mockup' | 'edit' | 'generation';
+  prompt?: string;
+}
