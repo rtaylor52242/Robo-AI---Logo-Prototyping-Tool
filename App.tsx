@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import JSZip from 'jszip';
 import { generateWithImageInput, generateWithTextInput } from './services/geminiService';
-import type { Tab, MockupOption, ImageData } from './types';
+import type { Tab, MockupOption, ImageData, MockupCategory } from './types';
 import { ImageUpload } from './components/ImageUpload';
 import { GeneratedImageDisplay } from './components/GeneratedImageDisplay';
 import { ImageModal } from './components/ImageModal';
@@ -29,6 +29,17 @@ const WalletIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" class
 const UmbrellaIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2v20m0 0a2 2 0 002 2m-2-2a2 2 0 01-2-2m0-16a9 9 0 1118 0H3a9 9 0 019 0z" /></svg>;
 const NotebookIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
 
+// New Icons
+const SocialMediaIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const BusinessCardIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" /></svg>;
+const StorefrontIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>;
+const VehicleWrapIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /><path d="M5 13a2 2 0 002 2h10a2 2 0 002-2v-4a2 2 0 00-2-2H7a2 2 0 00-2 2v4z" /></svg>; // Simplified Van/Transfer
+const MenuIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
+const BoothIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm4 9h10v6H7v-6z" /></svg>;
+const MoviePosterIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" /></svg>;
+const MagazineIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>;
+const PostcardIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
+
 const SunIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
 const MoonIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>;
 const HelpIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
@@ -45,36 +56,66 @@ const MirrorIcon: React.FC = () => (
         <path d="M13 10l4-4v8l-4-4z" />
     </svg>
 );
+const TransferIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+    <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
+  </svg>
+);
 
 
 // --- CONSTANTS ---
 const MOCKUP_OPTIONS: MockupOption[] = [
-  { id: 'tshirt', name: 'T-Shirt', promptSuffix: 'on the chest of a high-quality plain t-shirt, studio lighting, on a mannequin.', icon: <TShirtIcon /> },
-  { id: 'mug', name: 'Mug', promptSuffix: 'on the side of a glossy ceramic coffee mug, on a clean kitchen counter background.', icon: <MugIcon /> },
-  { id: 'totebag', name: 'Tote Bag', promptSuffix: 'on the front of a canvas tote bag, held by a person in a casual setting.', icon: <ToteBagIcon /> },
-  { id: 'sticker', name: 'Sticker', promptSuffix: 'as a die-cut vinyl sticker on a clean white background.', icon: <StickerIcon /> },
-  { id: 'hoodie', name: 'Hoodie', promptSuffix: 'on the chest of a black hoodie, realistic photo.', icon: <HoodieIcon /> },
-  { id: 'socks', name: 'Socks', promptSuffix: 'as a repeating pattern on a pair of crew socks.', icon: <SocksIcon /> },
-  { id: 'thermos', name: 'Thermos', promptSuffix: 'wrapped around a stainless steel thermos, on an outdoor table.', icon: <ThermosIcon /> },
-  { id: 'gloves', name: 'Gloves', promptSuffix: 'on the back of a pair of black winter gloves.', icon: <GlovesIcon /> },
-  { id: 'hat', name: 'Hat', promptSuffix: 'embroidered on the front of a baseball cap.', icon: <HatIcon /> },
-  { id: 'flipflops', name: 'Flip Flops', promptSuffix: 'on the strap of a pair of flip flops on a sandy beach.', icon: <FlipFlopsIcon /> },
-  { id: 'shotglass', name: 'Shot Glass', promptSuffix: 'printed on the side of a clear shot glass.', icon: <ShotGlassIcon /> },
-  { id: 'phonecase', name: 'Phone Case', promptSuffix: 'on the back of a black smartphone case.', icon: <PhoneCaseIcon /> },
-  { id: 'calendar', name: 'Calendar', promptSuffix: 'printed on the cover of a spiral-bound wall calendar.', icon: <CalendarIcon /> },
-  { id: 'tanktop', name: 'Tank Top', promptSuffix: 'on the chest of a plain tank top worn by a model.', icon: <TankTopIcon /> },
-  { id: 'bookbag', name: 'Book Bag', promptSuffix: 'embroidered on the front pocket of a sturdy canvas backpack.', icon: <BookBagIcon /> },
-  { id: 'wallet', name: 'Wallet', promptSuffix: 'embossed on the corner of a leather wallet.', icon: <WalletIcon /> },
-  { id: 'umbrella', name: 'Open Umbrella', promptSuffix: 'printed on a panel of a large open umbrella in the rain.', icon: <UmbrellaIcon /> },
-  { id: 'notebook', name: 'Notebook', promptSuffix: 'stamped on the hard cover of a closed Moleskine-style notebook.', icon: <NotebookIcon /> },
+  // Apparel
+  { id: 'tshirt', name: 'T-Shirt', promptSuffix: 'on the chest of a high-quality plain t-shirt, studio lighting, on a mannequin.', icon: <TShirtIcon />, category: 'Apparel' },
+  { id: 'hoodie', name: 'Hoodie', promptSuffix: 'on the chest of a black hoodie, realistic photo.', icon: <HoodieIcon />, category: 'Apparel' },
+  { id: 'socks', name: 'Socks', promptSuffix: 'as a repeating pattern on a pair of crew socks.', icon: <SocksIcon />, category: 'Apparel' },
+  { id: 'gloves', name: 'Gloves', promptSuffix: 'on the back of a pair of black winter gloves.', icon: <GlovesIcon />, category: 'Apparel' },
+  { id: 'hat', name: 'Hat', promptSuffix: 'embroidered on the front of a baseball cap.', icon: <HatIcon />, category: 'Apparel' },
+  { id: 'flipflops', name: 'Flip Flops', promptSuffix: 'on the strap of a pair of flip flops on a sandy beach.', icon: <FlipFlopsIcon />, category: 'Apparel' },
+  { id: 'tanktop', name: 'Tank Top', promptSuffix: 'on the chest of a plain tank top worn by a model.', icon: <TankTopIcon />, category: 'Apparel' },
+  { id: 'bookbag', name: 'Book Bag', promptSuffix: 'embroidered on the front pocket of a sturdy canvas backpack.', icon: <BookBagIcon />, category: 'Apparel' },
+  
+  // Merchandise
+  { id: 'mug', name: 'Mug', promptSuffix: 'on the side of a glossy ceramic coffee mug, on a clean kitchen counter background.', icon: <MugIcon />, category: 'Merchandise' },
+  { id: 'totebag', name: 'Tote Bag', promptSuffix: 'on the front of a canvas tote bag, held by a person in a casual setting.', icon: <ToteBagIcon />, category: 'Merchandise' },
+  { id: 'sticker', name: 'Sticker', promptSuffix: 'as a die-cut vinyl sticker on a clean white background.', icon: <StickerIcon />, category: 'Merchandise' },
+  { id: 'thermos', name: 'Thermos', promptSuffix: 'wrapped around a stainless steel thermos, on an outdoor table.', icon: <ThermosIcon />, category: 'Merchandise' },
+  { id: 'shotglass', name: 'Shot Glass', promptSuffix: 'printed on the side of a clear shot glass.', icon: <ShotGlassIcon />, category: 'Merchandise' },
+  { id: 'phonecase', name: 'Phone Case', promptSuffix: 'on the back of a black smartphone case.', icon: <PhoneCaseIcon />, category: 'Merchandise' },
+  { id: 'wallet', name: 'Wallet', promptSuffix: 'embossed on the corner of a leather wallet.', icon: <WalletIcon />, category: 'Merchandise' },
+  { id: 'umbrella', name: 'Open Umbrella', promptSuffix: 'printed on a panel of a large open umbrella in the rain.', icon: <UmbrellaIcon />, category: 'Merchandise' },
+
+  // Print
+  { id: 'notebook', name: 'Notebook', promptSuffix: 'stamped on the hard cover of a closed Moleskine-style notebook.', icon: <NotebookIcon />, category: 'Print' },
+  { id: 'calendar', name: 'Calendar', promptSuffix: 'printed on the cover of a spiral-bound wall calendar.', icon: <CalendarIcon />, category: 'Print' },
+  { id: 'businesscard', name: 'Business Cards', promptSuffix: 'on a stack of premium minimalist business cards.', icon: <BusinessCardIcon />, category: 'Print' },
+  { id: 'menu', name: 'Menu', promptSuffix: 'at the top of a restaurant menu on a wooden table.', icon: <MenuIcon />, category: 'Print' },
+  { id: 'movieposter', name: 'Movie Poster', promptSuffix: 'as the main title art on a cinematic movie poster.', icon: <MoviePosterIcon />, category: 'Print' },
+  { id: 'magazine', name: 'Magazine Cover', promptSuffix: 'as the main feature on the cover of a glossy magazine.', icon: <MagazineIcon />, category: 'Print' },
+  { id: 'postcard', name: 'Postcard', promptSuffix: 'on the front of a postcard lying on a desk.', icon: <PostcardIcon />, category: 'Print' },
+
+  // Signage & Digital
+  { id: 'socialmedia', name: 'Social Profile', promptSuffix: 'placed in the center of a circular social media profile picture frame.', icon: <SocialMediaIcon />, category: 'Signage' },
+  { id: 'storefront', name: 'Store Sign', promptSuffix: 'on a hanging storefront sign outside a modern boutique.', icon: <StorefrontIcon />, category: 'Signage' },
+  { id: 'vehicle', name: 'Vehicle Wrap', promptSuffix: 'as a vinyl wrap on the side of a white delivery van.', icon: <VehicleWrapIcon />, category: 'Signage' },
+  { id: 'booth', name: 'Trade Show', promptSuffix: 'on the back wall of a professional trade show booth.', icon: <BoothIcon />, category: 'Signage' },
 ];
 
-// --- FEATURE COMPONENTS (defined outside App to prevent re-renders) ---
+const CATEGORIES: MockupCategory[] = ['Apparel', 'Merchandise', 'Print', 'Signage'];
 
-const MockupGenerator: React.FC = () => {
-    const [logo, setLogo] = useState<ImageData | null>(null);
-    const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+// --- FEATURE COMPONENTS ---
+
+interface MockupGeneratorProps {
+  initialImage?: ImageData;
+  onTransfer: (data: ImageData, target: Tab) => void;
+}
+
+const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTransfer }) => {
+    const [logo, setLogo] = useState<ImageData | null>(initialImage || null);
+    const [logoPreview, setLogoPreview] = useState<string | null>(initialImage ? `data:${initialImage.mimeType};base64,${initialImage.base64}` : null);
     const [selectedMockups, setSelectedMockups] = useState<MockupOption[]>([MOCKUP_OPTIONS[0]]);
+    const [activeCategory, setActiveCategory] = useState<MockupCategory>('Apparel');
     const [isLoading, setIsLoading] = useState(false);
     const [isZipping, setIsZipping] = useState(false);
     const [isRemovingBg, setIsRemovingBg] = useState(false);
@@ -82,6 +123,14 @@ const MockupGenerator: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [resultImages, setResultImages] = useState<{ id: string; src: string; name: string }[]>([]);
     const [modalStartIndex, setModalStartIndex] = useState<number | null>(null);
+
+    // Update state if initialImage changes (e.g. transferred from another tab)
+    useEffect(() => {
+        if (initialImage) {
+            setLogo(initialImage);
+            setLogoPreview(`data:${initialImage.mimeType};base64,${initialImage.base64}`);
+        }
+    }, [initialImage]);
 
     const handleLogoUpload = useCallback((imageData: ImageData) => {
         setLogo(imageData);
@@ -96,11 +145,17 @@ const MockupGenerator: React.FC = () => {
       );
     };
 
-    const handleSelectAll = () => {
-        if (selectedMockups.length === MOCKUP_OPTIONS.length) {
-            setSelectedMockups([]);
+    const handleSelectAllInCategory = () => {
+        const categoryOptions = MOCKUP_OPTIONS.filter(m => m.category === activeCategory);
+        const allSelected = categoryOptions.every(opt => selectedMockups.some(s => s.id === opt.id));
+        
+        if (allSelected) {
+            // Deselect all in category
+            setSelectedMockups(prev => prev.filter(item => item.category !== activeCategory));
         } else {
-            setSelectedMockups(MOCKUP_OPTIONS);
+            // Select all in category
+            const newSelections = categoryOptions.filter(opt => !selectedMockups.some(s => s.id === opt.id));
+            setSelectedMockups(prev => [...prev, ...newSelections]);
         }
     };
     
@@ -228,6 +283,8 @@ const MockupGenerator: React.FC = () => {
         setIsLoading(false);
     };
 
+    const visibleMockups = MOCKUP_OPTIONS.filter(opt => opt.category === activeCategory);
+
     return (
         <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -236,14 +293,18 @@ const MockupGenerator: React.FC = () => {
                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Upload Your Logo</h3>
                         <ImageUpload onImageUpload={handleLogoUpload} title="Your Logo (PNG, JPG)" imagePreviewUrl={logoPreview} />
                         {logo && (
-                            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <button onClick={handleRemoveBackground} disabled={isRemovingBg || isMirroring || isLoading} className="w-full flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                <button onClick={handleRemoveBackground} disabled={isRemovingBg || isMirroring || isLoading} className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 text-sm rounded-lg transition-colors disabled:opacity-50">
                                     <MagicWandIcon />
-                                    {isRemovingBg ? 'Removing...' : 'Remove Background'}
+                                    {isRemovingBg ? 'Removing...' : 'Remove BG'}
                                 </button>
-                                <button onClick={handleMirrorImage} disabled={isMirroring || isRemovingBg || isLoading} className="w-full flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button onClick={handleMirrorImage} disabled={isMirroring || isRemovingBg || isLoading} className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 text-sm rounded-lg transition-colors disabled:opacity-50">
                                     <MirrorIcon />
-                                    {isMirroring ? 'Mirroring...' : 'Mirror Image'}
+                                    {isMirroring ? 'Mirroring...' : 'Mirror'}
+                                </button>
+                                <button onClick={() => onTransfer(logo, 'editor')} disabled={isLoading} className="flex items-center justify-center bg-brand-primary hover:bg-brand-secondary text-white font-medium py-2 px-3 text-sm rounded-lg transition-colors disabled:opacity-50">
+                                    <TransferIcon />
+                                    Edit in Editor
                                 </button>
                             </div>
                         )}
@@ -252,14 +313,28 @@ const MockupGenerator: React.FC = () => {
                          <div className="flex justify-between items-center mb-2">
                             <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">2. Choose Mockups</h3>
                             <button
-                                onClick={handleSelectAll}
+                                onClick={handleSelectAllInCategory}
                                 className="text-sm font-medium text-brand-primary hover:text-brand-secondary transition-colors"
                             >
-                                {selectedMockups.length === MOCKUP_OPTIONS.length ? 'Deselect All' : 'Select All'}
+                                {visibleMockups.every(opt => selectedMockups.some(s => s.id === opt.id)) ? 'Deselect All in Category' : 'Select All in Category'}
                             </button>
                         </div>
+                        
+                        {/* Category Tabs */}
+                        <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
+                            {CATEGORIES.map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-brand-primary text-white' : 'bg-gray-200 dark:bg-dark-card text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                                >
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-4">
-                            {MOCKUP_OPTIONS.map((opt) => (
+                            {visibleMockups.map((opt) => (
                                 <button key={opt.id} onClick={() => handleMockupSelect(opt)}
                                     className={`p-2 md:p-4 rounded-lg flex flex-col items-center justify-center text-center transition-all duration-200 ${selectedMockups.some(m => m.id === opt.id) ? 'bg-brand-primary text-white ring-2 ring-offset-2 ring-offset-white dark:ring-offset-dark-card ring-brand-primary' : 'bg-gray-100 dark:bg-dark-input hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
                                     {opt.icon}
@@ -331,12 +406,30 @@ const MockupGenerator: React.FC = () => {
     );
 };
 
-const ImageEditor: React.FC = () => {
-    const [image, setImage] = useState<ImageData | null>(null);
+interface ImageEditorProps {
+    initialImage?: ImageData;
+    onTransfer: (data: ImageData, target: Tab) => void;
+}
+
+const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer }) => {
+    const [image, setImage] = useState<ImageData | null>(initialImage || null);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(initialImage ? `data:${initialImage.mimeType};base64,${initialImage.base64}` : null);
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [resultImage, setResultImage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (initialImage) {
+            setImage(initialImage);
+            setImagePreviewUrl(`data:${initialImage.mimeType};base64,${initialImage.base64}`);
+        }
+    }, [initialImage]);
+
+    const handleImageUpload = (imageData: ImageData) => {
+        setImage(imageData);
+        setImagePreviewUrl(`data:${imageData.mimeType};base64,${imageData.base64}`);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -364,7 +457,13 @@ const ImageEditor: React.FC = () => {
                 <div className="space-y-6">
                     <div>
                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Upload Image to Edit</h3>
-                        <ImageUpload onImageUpload={setImage} title="Image to Edit (PNG, JPG)" />
+                        <ImageUpload onImageUpload={handleImageUpload} title="Image to Edit (PNG, JPG)" imagePreviewUrl={imagePreviewUrl} />
+                         {image && (
+                            <button onClick={() => onTransfer(image, 'mockup')} className="mt-2 w-full flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+                                <TransferIcon />
+                                Use as Mockup Logo
+                            </button>
+                        )}
                     </div>
                     <div>
                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">2. Describe Your Edit</h3>
@@ -380,6 +479,13 @@ const ImageEditor: React.FC = () => {
                 <div className="space-y-2">
                     <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">3. Result</h3>
                     <GeneratedImageDisplay imageUrl={resultImage} isLoading={isLoading} altText="Edited image" />
+                     {resultImage && !isLoading && (
+                         <div className="mt-2 flex gap-2">
+                             <button onClick={() => onTransfer({ base64: resultImage, mimeType: 'image/png' }, 'mockup')} className="flex-1 flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 rounded-lg transition-colors text-sm">
+                                <TransferIcon /> Use as Logo
+                            </button>
+                         </div>
+                    )}
                 </div>
             </div>
             {error && <div className="text-red-700 dark:text-red-400 text-center mt-4 p-2 bg-red-100 dark:bg-red-900/50 rounded-md">{error}</div>}
@@ -387,7 +493,11 @@ const ImageEditor: React.FC = () => {
     );
 };
 
-const ImageGenerator: React.FC = () => {
+interface ImageGeneratorProps {
+    onTransfer: (data: ImageData, target: Tab) => void;
+}
+
+const ImageGenerator: React.FC<ImageGeneratorProps> = ({ onTransfer }) => {
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -430,6 +540,16 @@ const ImageGenerator: React.FC = () => {
             <div className="space-y-2">
                 <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 text-center">2. Result</h3>
                 <GeneratedImageDisplay imageUrl={resultImage} isLoading={isLoading} altText="Generated image" />
+                {resultImage && !isLoading && (
+                    <div className="flex justify-center gap-4 mt-4">
+                        <button onClick={() => onTransfer({ base64: resultImage, mimeType: 'image/png' }, 'mockup')} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                            <TransferIcon /> Use as Logo
+                        </button>
+                        <button onClick={() => onTransfer({ base64: resultImage, mimeType: 'image/png' }, 'editor')} className="flex items-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                            <TransferIcon /> Edit Image
+                        </button>
+                    </div>
+                )}
             </div>
             {error && <div className="text-red-700 dark:text-red-400 text-center mt-4 p-2 bg-red-100 dark:bg-red-900/50 rounded-md">{error}</div>}
         </div>
@@ -442,6 +562,9 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('mockup');
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  
+  // Shared state for image transfer between tabs
+  const [sharedImage, setSharedImage] = useState<{data: ImageData, target: Tab} | null>(null);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -453,11 +576,29 @@ const App: React.FC = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
+  const handleTransfer = (data: ImageData, target: Tab) => {
+    setSharedImage({ data, target });
+    setActiveTab(target);
+    // Scroll to top to ensure the user sees the input area
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const renderContent = () => {
     switch (activeTab) {
-      case 'mockup': return <MockupGenerator />;
-      case 'editor': return <ImageEditor />;
-      case 'generator': return <ImageGenerator />;
+      case 'mockup': 
+        return <MockupGenerator 
+            initialImage={sharedImage?.target === 'mockup' ? sharedImage.data : undefined} 
+            onTransfer={handleTransfer} 
+        />;
+      case 'editor': 
+        return <ImageEditor 
+            initialImage={sharedImage?.target === 'editor' ? sharedImage.data : undefined} 
+            onTransfer={handleTransfer} 
+        />;
+      case 'generator': 
+        return <ImageGenerator 
+            onTransfer={handleTransfer} 
+        />;
       default: return null;
     }
   };
