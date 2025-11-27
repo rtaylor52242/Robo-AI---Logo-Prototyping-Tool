@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 
 interface HelpModalProps {
@@ -70,6 +71,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">Image Editor</h3>
             <ol className="list-decimal list-inside space-y-2">
               <li><strong>Upload Image:</strong> Upload or capture an image you want to modify.</li>
+              <li><strong>Add Text Overlay:</strong> Type text, choose color/size, and click 'Add'. Drag the text on the preview to position it. Click 'Burn Text into Image' to merge it permanently before AI generation.</li>
               <li><strong>Describe Your Edit:</strong> Type instructions like "Make it sunset" or click the <strong>Quick Style</strong> buttons (e.g., Cyberpunk, Watercolor) to apply presets.</li>
               <li><strong>Apply Edit:</strong> The AI will regenerate your image with the requested changes.</li>
             </ol>

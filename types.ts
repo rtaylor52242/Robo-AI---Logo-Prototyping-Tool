@@ -41,3 +41,14 @@ export interface HistoryItem {
   prompt?: string;
   aspectRatio?: string;
 }
+
+export interface TextOverlay {
+    id: string;
+    text: string;
+    x: number; // percentage 0-100
+    y: number; // percentage 0-100
+    color: string;
+    size: number;
+    opacity: number; // 0-1
+    rotation: number; // degrees
+}

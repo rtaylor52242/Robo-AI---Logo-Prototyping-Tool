@@ -40,6 +40,33 @@ const mapToStandardRatio = (ratio: string): string => {
 };
 
 /**
+ * Enhances a simple prompt into a more detailed and descriptive one.
+ * Uses gemini-2.5-flash for text processing.
+ */
+export const enhancePrompt = async (originalPrompt: string): Promise<string> => {
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: `Rewrite the following image generation prompt to be significantly more detailed, descriptive, and artistic to result in a higher quality image. 
+            
+            Keep the core subject and intent exactly as described, but enrich it with:
+            1. Lighting details (e.g., cinematic, natural, studio, volumetric)
+            2. Texture and Material details
+            3. Camera angle or composition (e.g., wide angle, macro, depth of field)
+            4. Art style or aesthetic (e.g., photorealistic, oil painting, cyberpunk) if not already specified.
+            
+            Output ONLY the enhanced prompt text. Do not add explanations.
+
+            Original Prompt: "${originalPrompt}"`,
+        });
+        return response.text?.trim() || originalPrompt;
+    } catch (error) {
+        console.error("Error enhancing prompt:", error);
+        throw new Error("Failed to enhance prompt.");
+    }
+};
+
+/**
  * Generates or edits an image using a prompt and an optional input image.
  * Uses gemini-2.5-flash-image for image-aware generation.
  * @param prompt The text prompt.

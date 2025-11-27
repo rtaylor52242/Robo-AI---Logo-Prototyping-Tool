@@ -1,13 +1,14 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import JSZip from 'jszip';
-import { generateWithImageInput, generateWithTextInput } from './services/geminiService';
-import type { Tab, MockupOption, ImageData, MockupCategory, HistoryItem, InspirationOption, InspirationCategory, AspectRatio } from './types';
+import { generateWithImageInput, generateWithTextInput, enhancePrompt } from './services/geminiService';
+import type { Tab, MockupOption, ImageData, MockupCategory, HistoryItem, InspirationOption, InspirationCategory, AspectRatio, TextOverlay } from './types';
 import { ImageUpload } from './components/ImageUpload';
 import { GeneratedImageDisplay } from './components/GeneratedImageDisplay';
 import { ImageModal } from './components/ImageModal';
 import { HelpModal } from './components/HelpModal';
 import { HistoryModal } from './components/HistoryModal';
+import { ImageCropper } from './components/ImageCropper';
 
 // --- ICONS (as components) ---
 const TShirtIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-5h-5v5zM3 20h5v-5H3v5zm5-10H3l3-7h5l3 7H8zm13-7l3 7h-5l3-7h2zM8 10h8v10H8V10z" /></svg>;
@@ -91,6 +92,8 @@ const SunIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" classNam
 const MoonIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>;
 const HelpIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 const HistoryIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const PaletteIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>;
+
 const DownloadIcon: React.FC<{className?: string}> = ({className = "h-5 w-5 mr-2"}) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -110,6 +113,24 @@ const TransferIcon: React.FC = () => (
   </svg>
 );
 const LightBulbIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" /></svg>;
+
+const SparklesIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clipRule="evenodd" />
+    </svg>
+);
+
+const TextIcon: React.FC = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+  </svg>
+);
+
+const CropIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" clipRule="evenodd" />
+    </svg>
+);
 
 
 // --- CONSTANTS ---
@@ -229,6 +250,19 @@ const RANDOM_PROMPTS = [
   "A close-up macro shot of a dew drop on a spider web"
 ];
 
+const THEMES = [
+  { name: 'Indigo', primary: '#4f46e5', secondary: '#7c3aed' },
+  { name: 'Ocean', primary: '#06b6d4', secondary: '#0284c7' },
+  { name: 'Forest', primary: '#10b981', secondary: '#047857' },
+  { name: 'Sunset', primary: '#f97316', secondary: '#db2777' },
+  { name: 'Berry', primary: '#ec4899', secondary: '#be185d' },
+  { name: 'Royal', primary: '#8b5cf6', secondary: '#5b21b6' },
+  { name: 'Fire', primary: '#ef4444', secondary: '#991b1b' },
+  { name: 'Gold', primary: '#eab308', secondary: '#a16207' },
+  { name: 'Midnight', primary: '#3b82f6', secondary: '#1e40af' },
+  { name: 'Steel', primary: '#64748b', secondary: '#334155' },
+];
+
 interface ErrorDetails {
     message: string;
     stack?: string;
@@ -257,6 +291,17 @@ const ErrorDisplay: React.FC<{ error: ErrorDetails | null }> = ({ error }) => {
         </div>
     );
 };
+
+// Helper to calculate image dimensions
+const getImageDimensions = (base64: string): Promise<{ w: number, h: number }> => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve({ w: img.width, h: img.height });
+        img.onerror = () => resolve({ w: 1024, h: 1024 }); // Fallback
+        img.src = `data:image/png;base64,${base64}`;
+    });
+};
+
 
 // --- ASPECT RATIO SELECTOR ---
 
@@ -368,6 +413,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
     const [isZipping, setIsZipping] = useState(false);
     const [isRemovingBg, setIsRemovingBg] = useState(false);
     const [isMirroring, setIsMirroring] = useState(false);
+    const [isCropping, setIsCropping] = useState(false);
     const [error, setError] = useState<ErrorDetails | null>(null);
     const [resultImages, setResultImages] = useState<{ id: string; src: string; name: string }[]>([]);
     const [modalStartIndex, setModalStartIndex] = useState<number | null>(null);
@@ -376,12 +422,18 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
     const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
     const [customDims, setCustomDims] = useState({ w: 1024, h: 1024 });
 
-    // Update state if initialImage changes (e.g. transferred from another tab)
     useEffect(() => {
-        if (initialImage) {
-            setLogo(initialImage);
-            setLogoPreview(`data:${initialImage.mimeType};base64,${initialImage.base64}`);
-        }
+        const updateDims = async () => {
+            if (initialImage) {
+                setLogo(initialImage);
+                setLogoPreview(`data:${initialImage.mimeType};base64,${initialImage.base64}`);
+                // Preserve dimensions from input image
+                const dims = await getImageDimensions(initialImage.base64);
+                setAspectRatio('Custom');
+                setCustomDims(dims);
+            }
+        };
+        updateDims();
     }, [initialImage]);
 
     const handleLogoUpload = useCallback((imageData: ImageData) => {
@@ -468,6 +520,13 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
         } finally {
             setIsMirroring(false);
         }
+    };
+
+    const handleCrop = (croppedData: ImageData) => {
+        setLogo(croppedData);
+        setLogoPreview(`data:${croppedData.mimeType};base64,${croppedData.base64}`);
+        setIsCropping(false);
+        onAddToHistory({ imageData: croppedData, type: 'edit', prompt: 'Cropped image' });
     };
     
     const handleDownloadAll = async () => {
@@ -562,14 +621,18 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Upload Your Logo</h3>
                         <ImageUpload onImageUpload={handleLogoUpload} title="Your Logo (PNG, JPG)" imagePreviewUrl={logoPreview} id="mockup-upload" />
                         {logo && (
-                            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
                                 <button onClick={handleRemoveBackground} disabled={isRemovingBg || isMirroring || isLoading} className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 text-sm rounded-lg transition-colors disabled:opacity-50">
                                     <MagicWandIcon />
-                                    {isRemovingBg ? 'Removing...' : 'Remove BG'}
+                                    {isRemovingBg ? 'Working...' : 'Remove BG'}
                                 </button>
                                 <button onClick={handleMirrorImage} disabled={isMirroring || isRemovingBg || isLoading} className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 text-sm rounded-lg transition-colors disabled:opacity-50">
                                     <MirrorIcon />
-                                    {isMirroring ? 'Mirroring...' : 'Mirror'}
+                                    {isMirroring ? 'Working...' : 'Mirror'}
+                                </button>
+                                <button onClick={() => setIsCropping(true)} disabled={isLoading} className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 text-sm rounded-lg transition-colors disabled:opacity-50">
+                                    <CropIcon />
+                                    Crop
                                 </button>
                                 <button onClick={() => onTransfer(logo, 'editor')} disabled={isLoading} className="flex items-center justify-center bg-brand-primary hover:bg-brand-secondary text-white font-medium py-2 px-3 text-sm rounded-lg transition-colors disabled:opacity-50">
                                     <TransferIcon />
@@ -680,6 +743,13 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
                     </div>
                 </div>
             </div>
+            {isCropping && logo && (
+                <ImageCropper 
+                    imageData={logo} 
+                    onCrop={handleCrop} 
+                    onCancel={() => setIsCropping(false)} 
+                />
+            )}
             <ErrorDisplay error={error} />
             {modalStartIndex !== null && <ImageModal images={resultImages} startIndex={modalStartIndex} onClose={() => setModalStartIndex(null)} />}
         </div>
@@ -697,6 +767,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
     const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(initialImage ? `data:${initialImage.mimeType};base64,${initialImage.base64}` : null);
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isCropping, setIsCropping] = useState(false);
     const [error, setError] = useState<ErrorDetails | null>(null);
     const [resultImage, setResultImage] = useState<string | null>(null);
 
@@ -704,11 +775,29 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
     const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
     const [customDims, setCustomDims] = useState({ w: 1024, h: 1024 });
 
+    // Text Overlay / Watermark State
+    const [texts, setTexts] = useState<TextOverlay[]>([]);
+    const [newText, setNewText] = useState('');
+    const [textColor, setTextColor] = useState('#ffffff');
+    const [textSize, setTextSize] = useState(30);
+    const [textOpacity, setTextOpacity] = useState(1);
+    const [textRotation, setTextRotation] = useState(0);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [draggingId, setDraggingId] = useState<string | null>(null);
+
     useEffect(() => {
-        if (initialImage) {
-            setImage(initialImage);
-            setImagePreviewUrl(`data:${initialImage.mimeType};base64,${initialImage.base64}`);
-        }
+        const updateDims = async () => {
+             if (initialImage) {
+                setImage(initialImage);
+                setImagePreviewUrl(`data:${initialImage.mimeType};base64,${initialImage.base64}`);
+                // Preserve dimensions
+                const dims = await getImageDimensions(initialImage.base64);
+                setAspectRatio('Custom');
+                setCustomDims(dims);
+            }
+        };
+        updateDims();
     }, [initialImage]);
 
     const handleImageUpload = (imageData: ImageData) => {
@@ -726,6 +815,138 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
             }
             return `Make this image ${style} style.`;
         });
+    };
+
+    const addTextOverlay = () => {
+        if (!newText.trim()) return;
+        setTexts(prev => [...prev, {
+            id: Date.now().toString(),
+            text: newText,
+            x: 50, // center
+            y: 50, // center
+            color: textColor,
+            size: textSize,
+            opacity: textOpacity,
+            rotation: textRotation
+        }]);
+        setNewText('');
+        // Reset some defaults but keep color/size for ease of use
+        setTextRotation(0);
+        setTextOpacity(1);
+    };
+
+    const removeTextOverlay = (id: string) => {
+        setTexts(prev => prev.filter(t => t.id !== id));
+    };
+
+    const handleDragStart = (e: React.MouseEvent | React.TouchEvent, id: string) => {
+        e.stopPropagation();
+        setDraggingId(id);
+    };
+
+    const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
+        if (!draggingId || !containerRef.current) return;
+
+        const container = containerRef.current.getBoundingClientRect();
+        let clientX, clientY;
+
+        if (e instanceof MouseEvent) {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        } else {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        }
+
+        let xPct = ((clientX - container.left) / container.width) * 100;
+        let yPct = ((clientY - container.top) / container.height) * 100;
+
+        // Clamp to 0-100
+        xPct = Math.max(0, Math.min(100, xPct));
+        yPct = Math.max(0, Math.min(100, yPct));
+
+        setTexts(prev => prev.map(t => t.id === draggingId ? { ...t, x: xPct, y: yPct } : t));
+    }, [draggingId]);
+
+    const handleDragEnd = useCallback(() => {
+        setDraggingId(null);
+    }, []);
+
+    useEffect(() => {
+        if (draggingId) {
+            window.addEventListener('mousemove', handleDragMove);
+            window.addEventListener('mouseup', handleDragEnd);
+            window.addEventListener('touchmove', handleDragMove);
+            window.addEventListener('touchend', handleDragEnd);
+        } else {
+            window.removeEventListener('mousemove', handleDragMove);
+            window.removeEventListener('mouseup', handleDragEnd);
+            window.removeEventListener('touchmove', handleDragMove);
+            window.removeEventListener('touchend', handleDragEnd);
+        }
+        return () => {
+            window.removeEventListener('mousemove', handleDragMove);
+            window.removeEventListener('mouseup', handleDragEnd);
+            window.removeEventListener('touchmove', handleDragMove);
+            window.removeEventListener('touchend', handleDragEnd);
+        };
+    }, [draggingId, handleDragMove, handleDragEnd]);
+
+    const handleCrop = (croppedData: ImageData) => {
+        setImage(croppedData);
+        setImagePreviewUrl(`data:${croppedData.mimeType};base64,${croppedData.base64}`);
+        setIsCropping(false);
+        onAddToHistory({ imageData: croppedData, type: 'edit', prompt: 'Cropped image' });
+    };
+
+    const mergeTextToImage = async () => {
+        if (!image || texts.length === 0) return;
+        setIsLoading(true);
+        try {
+            const img = new Image();
+            img.src = `data:${image.mimeType};base64,${image.base64}`;
+            await new Promise(r => img.onload = r);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error("Canvas context failed");
+
+            ctx.drawImage(img, 0, 0);
+
+            texts.forEach(t => {
+                ctx.save();
+                ctx.font = `${(t.size / 100) * img.height * 0.5}px sans-serif`; // Scale text relative to image height somewhat
+                ctx.fillStyle = t.color;
+                ctx.globalAlpha = t.opacity;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const posX = (t.x / 100) * img.width;
+                const posY = (t.y / 100) * img.height;
+                
+                ctx.translate(posX, posY);
+                ctx.rotate((t.rotation * Math.PI) / 180);
+                
+                ctx.fillText(t.text, 0, 0);
+                ctx.restore();
+            });
+
+            const dataUrl = canvas.toDataURL('image/png');
+            const base64 = dataUrl.split(',')[1];
+            
+            const newImageData = { base64, mimeType: 'image/png' };
+            setImage(newImageData);
+            setImagePreviewUrl(dataUrl);
+            setTexts([]); // Clear texts after merge
+            onAddToHistory({ imageData: newImageData, type: 'edit', prompt: 'Added text/watermark overlay', aspectRatio: 'Custom' });
+
+        } catch (e: any) {
+            setError({ message: 'Failed to merge text.', details: e.message });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -762,12 +983,48 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                 <div className="space-y-6">
                     <div>
                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Upload Image to Edit</h3>
-                        <ImageUpload onImageUpload={handleImageUpload} title="Image to Edit (PNG, JPG)" imagePreviewUrl={imagePreviewUrl} id="editor-upload" />
+                        {/* Image Preview with Text Overlay */}
+                        <div className="relative group" ref={containerRef}>
+                             <ImageUpload onImageUpload={handleImageUpload} title="Image to Edit (PNG, JPG)" imagePreviewUrl={imagePreviewUrl} id="editor-upload" />
+                             
+                             {/* Text Overlays Layer */}
+                             {image && texts.map(t => (
+                                 <div 
+                                    key={t.id}
+                                    onMouseDown={(e) => handleDragStart(e, t.id)}
+                                    onTouchStart={(e) => handleDragStart(e, t.id)}
+                                    className="absolute cursor-move select-none px-2 py-1 border border-dashed border-white/50 bg-black/20 hover:bg-black/40 rounded whitespace-nowrap"
+                                    style={{ 
+                                        left: `${t.x}%`, 
+                                        top: `${t.y}%`, 
+                                        transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
+                                        color: t.color,
+                                        fontSize: `${t.size}px`,
+                                        opacity: t.opacity,
+                                        zIndex: 10
+                                    }}
+                                 >
+                                    {t.text}
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); removeTextOverlay(t.id); }}
+                                        className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        &times;
+                                    </button>
+                                 </div>
+                             ))}
+                        </div>
+                        
                          {image && (
-                            <button onClick={() => onTransfer(image, 'mockup')} className="mt-2 w-full flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
-                                <TransferIcon />
-                                Use as Mockup Logo
-                            </button>
+                            <div className="mt-2 flex gap-2">
+                                <button onClick={() => setIsCropping(true)} className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 rounded-lg transition-colors text-sm w-1/3">
+                                    <CropIcon /> Crop
+                                </button>
+                                <button onClick={() => onTransfer(image, 'mockup')} className="flex-1 flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm">
+                                    <TransferIcon />
+                                    Use as Mockup Logo
+                                </button>
+                            </div>
                         )}
                     </div>
                     
@@ -780,6 +1037,89 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                             onCustomChange={(w, h) => setCustomDims({w, h})}
                         />
                     </div>
+                    
+                    {/* Add Text / Watermark Section */}
+                    {image && (
+                        <div className="p-4 bg-gray-50 dark:bg-dark-input rounded-lg border border-gray-200 dark:border-dark-border">
+                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                                <TextIcon /> Add Text Overlay / Watermark
+                            </h3>
+                            <div className="flex gap-2 mb-2">
+                                <input 
+                                    type="text" 
+                                    value={newText} 
+                                    onChange={(e) => setNewText(e.target.value)} 
+                                    placeholder="Enter text..." 
+                                    className="flex-1 p-2 text-sm rounded bg-white dark:bg-dark-card border border-gray-300 dark:border-gray-600"
+                                />
+                                <input 
+                                    type="color" 
+                                    value={textColor} 
+                                    onChange={(e) => setTextColor(e.target.value)} 
+                                    className="w-10 h-10 p-1 bg-white dark:bg-dark-card border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
+                                    title="Text Color"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Size: {textSize}</label>
+                                    <input 
+                                        type="range" 
+                                        min="10" 
+                                        max="100" 
+                                        value={textSize} 
+                                        onChange={(e) => setTextSize(parseInt(e.target.value))} 
+                                        className="w-full"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Opacity: {Math.round(textOpacity * 100)}%</label>
+                                    <input 
+                                        type="range" 
+                                        min="0.1" 
+                                        max="1" 
+                                        step="0.1"
+                                        value={textOpacity} 
+                                        onChange={(e) => setTextOpacity(parseFloat(e.target.value))} 
+                                        className="w-full"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-xs text-gray-500 block mb-1">Rotation: {textRotation}°</label>
+                                    <input 
+                                        type="range" 
+                                        min="0" 
+                                        max="360" 
+                                        value={textRotation} 
+                                        onChange={(e) => setTextRotation(parseInt(e.target.value))} 
+                                        className="w-full"
+                                    />
+                                </div>
+                                <div className="flex items-end">
+                                    <button 
+                                        onClick={addTextOverlay}
+                                        disabled={!newText.trim()}
+                                        className="w-full px-3 py-1 bg-brand-primary text-white text-xs font-bold rounded disabled:opacity-50 h-8"
+                                    >
+                                        Add Text
+                                    </button>
+                                </div>
+                            </div>
+
+                            {texts.length > 0 && (
+                                <button 
+                                    onClick={mergeTextToImage}
+                                    disabled={isLoading}
+                                    className="w-full mt-2 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded flex items-center justify-center transition-colors"
+                                >
+                                    {isLoading ? 'Merging...' : 'Burn Text into Image (Permanent)'}
+                                </button>
+                            )}
+                            <p className="text-[10px] text-gray-400 mt-1">
+                                * Drag text on image to reposition. Reduce opacity for watermark effect. Click 'Burn' to save it before AI editing.
+                            </p>
+                        </div>
+                    )}
 
                     <div>
                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">3. Describe Your Edit</h3>
@@ -795,7 +1135,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                                         key={style}
                                         type="button"
                                         onClick={() => handleAddStyle(style)}
-                                        className="px-2 py-1 text-xs bg-gray-200 dark:bg-dark-card hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded border border-transparent hover:border-gray-400 dark:hover:border-gray-500 transition-all"
+                                        className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-dark-card text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors border border-transparent"
                                     >
                                         {style}
                                     </button>
@@ -820,6 +1160,13 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                     )}
                 </div>
             </div>
+            {isCropping && image && (
+                <ImageCropper 
+                    imageData={image} 
+                    onCrop={handleCrop} 
+                    onCancel={() => setIsCropping(false)} 
+                />
+            )}
             <ErrorDisplay error={error} />
         </div>
     );
@@ -828,6 +1175,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
 const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' | 'timestamp'>) => void, onTransfer: (data: ImageData, target: Tab) => void }> = ({ onAddToHistory, onTransfer }) => {
     const [prompt, setPrompt] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isEnhancing, setIsEnhancing] = useState(false);
     const [error, setError] = useState<ErrorDetails | null>(null);
     const [resultImage, setResultImage] = useState<string | null>(null);
     
@@ -857,6 +1205,22 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
 
         const randomPrompt = pool[Math.floor(Math.random() * pool.length)];
         setPrompt(randomPrompt);
+    };
+    
+    const handleEnhancePrompt = async () => {
+        if (!prompt.trim()) return;
+        setIsEnhancing(true);
+        setError(null);
+        try {
+            const enhanced = await enhancePrompt(prompt);
+            setPrompt(enhanced);
+        } catch (err: any) {
+             // Silently log error or show small warning, keeping prompt intact
+             console.error("Enhancement failed", err);
+             setError({ message: "Could not enhance prompt. Please try again." });
+        } finally {
+            setIsEnhancing(false);
+        }
     };
     
     const toggleInspiration = (id: string) => {
@@ -945,16 +1309,28 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
                                 value={prompt} 
                                 onChange={(e) => setPrompt(e.target.value)} 
                                 placeholder="A futuristic city with flying cars..."
-                                className="w-full h-32 p-3 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition resize-none"
+                                className="w-full h-32 p-3 pb-12 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition resize-none"
                             />
-                            <button 
-                                type="button" 
-                                onClick={handleSurpriseMe}
-                                className={`absolute bottom-2 right-2 text-xs px-3 py-1.5 rounded transition-all flex items-center font-medium ${selectedInspirations.length > 0 ? 'bg-brand-secondary text-white hover:bg-opacity-90' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'}`}
-                            >
-                                <LightBulbIcon /> 
-                                {selectedInspirations.length > 0 ? `Inspire Me (${selectedInspirations.length})` : 'Inspire Me'}
-                            </button>
+                            <div className="absolute bottom-2 right-2 flex gap-2">
+                                <button 
+                                    type="button" 
+                                    onClick={handleEnhancePrompt}
+                                    disabled={isEnhancing || !prompt.trim()}
+                                    className="text-xs px-3 py-1.5 rounded transition-all flex items-center font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50"
+                                    title="Rewrites your prompt to add more detail and style"
+                                >
+                                    <SparklesIcon /> 
+                                    {isEnhancing ? 'Enhancing...' : 'Enhance Prompt'}
+                                </button>
+                                <button 
+                                    type="button" 
+                                    onClick={handleSurpriseMe}
+                                    className={`text-xs px-3 py-1.5 rounded transition-all flex items-center font-medium ${selectedInspirations.length > 0 ? 'bg-brand-secondary text-white hover:bg-opacity-90' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'}`}
+                                >
+                                    <LightBulbIcon /> 
+                                    {selectedInspirations.length > 0 ? `Inspire Me (${selectedInspirations.length})` : 'Inspire Me'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -991,6 +1367,9 @@ const App: React.FC = () => {
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [history, setHistory] = useState<HistoryItem[]>([]);
     
+    // Theme State
+    const [currentThemeIndex, setCurrentThemeIndex] = useState(0);
+
     // Shared State for Transfer
     const [sharedImage, setSharedImage] = useState<ImageData | undefined>(undefined);
     const [transferTarget, setTransferTarget] = useState<Tab | null>(null);
@@ -1016,6 +1395,18 @@ const App: React.FC = () => {
         setIsDarkMode(!isDarkMode);
         document.documentElement.classList.toggle('dark');
     };
+
+    const cycleTheme = () => {
+        const nextIndex = (currentThemeIndex + 1) % THEMES.length;
+        setCurrentThemeIndex(nextIndex);
+    };
+
+    useEffect(() => {
+        const theme = THEMES[currentThemeIndex];
+        document.documentElement.style.setProperty('--brand-primary', theme.primary);
+        document.documentElement.style.setProperty('--brand-secondary', theme.secondary);
+    }, [currentThemeIndex]);
+
 
     const addToHistory = (item: Omit<HistoryItem, 'id' | 'timestamp'>) => {
         const newItem: HistoryItem = {
@@ -1075,6 +1466,9 @@ const App: React.FC = () => {
                         </h1>
                     </div>
                     <div className="flex items-center space-x-4">
+                        <button onClick={cycleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300" title={`Change Theme (Current: ${THEMES[currentThemeIndex].name})`}>
+                            <PaletteIcon />
+                        </button>
                          <button onClick={() => setIsHistoryOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300" title="History">
                             <HistoryIcon />
                         </button>

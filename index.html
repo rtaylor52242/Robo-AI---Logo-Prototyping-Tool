@@ -13,8 +13,8 @@
         theme: {
           extend: {
             colors: {
-              'brand-primary': '#4f46e5',
-              'brand-secondary': '#7c3aed',
+              'brand-primary': 'var(--brand-primary)',
+              'brand-secondary': 'var(--brand-secondary)',
               'dark-bg': '#111827',
               'dark-card': '#1f2937',
               'dark-input': '#374151',
@@ -24,6 +24,12 @@
         },
       }
     </script>
+    <style>
+      :root {
+        --brand-primary: #4f46e5;
+        --brand-secondary: #7c3aed;
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
