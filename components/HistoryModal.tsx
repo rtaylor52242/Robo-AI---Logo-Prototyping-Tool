@@ -8,6 +8,7 @@ interface HistoryModalProps {
   onClose: () => void;
   history: HistoryItem[];
   onTransfer: (data: ImageData, target: Tab) => void;
+  onDelete: (id: string) => void;
 }
 
 const TransferIcon: React.FC = () => (
@@ -18,11 +19,17 @@ const TransferIcon: React.FC = () => (
 
 const ZoomInIcon: React.FC = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
   </svg>
 );
 
-export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, history, onTransfer }) => {
+const TrashIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+);
+
+export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, history, onTransfer, onDelete }) => {
   const [zoomImage, setZoomImage] = useState<{ src: string, name: string } | null>(null);
 
   if (!isOpen) return null;
@@ -65,7 +72,14 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
               ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                       {history.slice().reverse().map((item) => (
-                          <div key={item.id} className="bg-gray-50 dark:bg-dark-input rounded-lg overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700 group transition-all hover:shadow-lg">
+                          <div key={item.id} className="bg-gray-50 dark:bg-dark-input rounded-lg overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700 group transition-all hover:shadow-lg relative">
+                               <button 
+                                    onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}
+                                    className="absolute top-2 right-2 z-10 p-2 bg-white/80 dark:bg-black/50 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="Delete from history"
+                                >
+                                    <TrashIcon />
+                                </button>
                               <div 
                                 className="relative aspect-square cursor-zoom-in group-hover:opacity-90 transition-opacity"
                                 onClick={() => setZoomImage({ src: item.imageData.base64, name: item.prompt || 'History Item' })}
@@ -88,6 +102,11 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
                                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-medium" title={item.prompt}>
                                       {item.prompt || 'No prompt'}
                                   </p>
+                                  {item.aspectRatio && (
+                                      <span className="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-1 rounded w-fit">
+                                          {item.aspectRatio}
+                                      </span>
+                                  )}
                                   <div className="text-[10px] text-gray-400 mb-2 uppercase tracking-wide">
                                       {new Date(item.timestamp).toLocaleString()}
                                   </div>
@@ -115,7 +134,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
       </div>
       
       {zoomImage && (
-        <div className="z-[60] relative">
+        <div className="z-[70] relative">
             <ImageModal 
                 images={[{ src: zoomImage.src, name: zoomImage.name }]} 
                 startIndex={0} 

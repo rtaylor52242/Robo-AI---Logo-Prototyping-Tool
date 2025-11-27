@@ -1,5 +1,7 @@
 {
   "name": "Robo AI - Logo Prototyping Tool",
   "description": "An AI-powered tool to edit images, generate new images from text, and place your logo on product mockups like t-shirts and mugs.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

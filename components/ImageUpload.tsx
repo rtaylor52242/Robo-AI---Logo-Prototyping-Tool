@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import type { ImageData } from '../types';
 
@@ -6,6 +5,7 @@ interface ImageUploadProps {
   onImageUpload: (imageData: ImageData) => void;
   title: string;
   imagePreviewUrl?: string | null;
+  id: string; // Unique ID to prevent label conflicts
 }
 
 const fileToBase64 = (file: File): Promise<ImageData> => {
@@ -34,7 +34,7 @@ const CameraIcon: React.FC = () => (
   </svg>
 );
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, title, imagePreviewUrl }) => {
+export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, title, imagePreviewUrl, id }) => {
   const [internalImagePreview, setInternalImagePreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -81,9 +81,12 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, title, 
       setIsCameraOpen(true);
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
+      // Use a small timeout to ensure the video element is mounted and ref is populated
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
     } catch (err) {
       console.error("Error accessing camera:", err);
       alert("Could not access camera. Please check permissions.");
@@ -121,7 +124,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, title, 
       {!isCameraOpen ? (
         <>
           <label
-            htmlFor="file-upload"
+            htmlFor={id}
             className={`relative flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 dark:border-dark-border border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-dark-input hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${isDragging ? 'border-brand-primary' : ''}`}
             onDrop={handleDrop}
             onDragEnter={handleDragEvents}
@@ -139,7 +142,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ onImageUpload, title, 
                 <p className="text-xs text-gray-500 dark:text-gray-500">{title}</p>
               </div>
             )}
-            <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
+            <input id={id} name={id} type="file" className="sr-only" accept="image/*" onChange={handleFileChange} />
           </label>
           <div className="flex justify-center">
             <button 
