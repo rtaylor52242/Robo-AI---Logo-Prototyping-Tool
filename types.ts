@@ -6,7 +6,7 @@ export type Tab = 'mockup' | 'editor' | 'generator';
 
 export type MockupCategory = 'Apparel' | 'Merchandise' | 'Print' | 'Signage';
 
-export type InspirationCategory = 'Characters' | 'Places' | 'Objects' | 'Art';
+export type InspirationCategory = 'Characters' | 'Places' | 'Objects' | 'Art' | 'Social Media';
 
 export type AspectRatio = 
   | '1:1' | '1:3' | '1:2' | '9:16' | '10:16' | '2:3' | '3:4' | '4:5' 

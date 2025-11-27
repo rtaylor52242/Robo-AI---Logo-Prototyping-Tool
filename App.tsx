@@ -54,6 +54,13 @@ const KioskIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" classN
 const WindowDecalIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4h16v16H4V4z" /><path d="M9 9h6v6H9V9z" /></svg>;
 const AFrameIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3L4 21h16L12 3z" /><path d="M12 8v8" /></svg>;
 
+// Social Icons
+const YouTubeIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+const BlogIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" /></svg>;
+const AlbumIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>;
+const ButtonIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>; // Reusing bolt for action button
+
+
 // Inspiration Icons
 const PortraitIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
 const MonsterIcon: React.FC = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>; // Representing a group/creature
@@ -220,10 +227,20 @@ const INSPIRATION_OPTIONS: InspirationOption[] = [
     { id: 'tattoo', name: 'Tattoo', category: 'Art', icon: <TattooIcon />, prompts: ["A traditional rose tattoo design.", "A geometric wolf tattoo design.", "A watercolor style tattoo of a hummingbird."] },
     { id: 'isometric', name: 'Isometric', category: 'Art', icon: <IsometricIcon />, prompts: ["An isometric low poly render of a cozy cottage.", "An isometric view of a futuristic factory floor.", "An isometric 3D room design."] },
     { id: 'mascot', name: 'Mascot', category: 'Art', icon: <MascotIcon />, prompts: ["A cheerful mascot character for a cereal brand.", "A fierce sports team mascot logo of a bull.", "A cute 3D mascot for a software company."] },
+
+    // Social Media
+    { id: 'yt-thumb', name: 'Youtube Thumbnail', category: 'Social Media', icon: <YouTubeIcon />, prompts: ["A high contrast youtube thumbnail background with bright colors and expressive lighting, 4k.", "An exciting gaming video thumbnail background, dynamic action.", "A clean tech review thumbnail background with soft studio lighting."] },
+    { id: 'yt-banner', name: 'Youtube Banner', category: 'Social Media', icon: <YouTubeIcon />, prompts: ["A sleek abstract channel art banner, wide aspect ratio, futuristic design.", "A cozy lifestyle vlog channel banner with pastel colors.", "A gaming channel banner with neon accents and dark background."] },
+    { id: 'profile-pic', name: 'Profile Picture', category: 'Social Media', icon: <SocialMediaIcon />, prompts: ["A professional profile picture background, gradient colors, clean look.", "A cool avatar background with abstract geometric shapes.", "A artistic profile picture frame with floral elements."] },
+    { id: 'blog-post', name: 'Blog Post Image', category: 'Social Media', icon: <BlogIcon />, prompts: ["An engaging hero image for a technology blog post, modern isometric style.", "A creative header image for a lifestyle article, flat design.", "A conceptual illustration for a finance blog, abstract data visualization."] },
+    { id: 'album-cover', name: 'Album Cover', category: 'Social Media', icon: <AlbumIcon />, prompts: ["A surreal album cover art featuring floating islands, vinyl style.", "A retro synthwave album cover with a grid sun and mountains.", "A minimalist indie rock album cover, abstract photography."] },
+    { id: 'logo-social', name: 'Logo', category: 'Social Media', icon: <LogoIcon />, prompts: ["A modern app icon logo for a social media startup, vibrant gradient.", "A minimalist personal brand logo, monogram style.", "A playful mascot logo for a gaming community."] },
+    { id: 'poster-social', name: 'Poster', category: 'Social Media', icon: <MoviePosterIcon />, prompts: ["A trendy event poster design for social media feed, bold typography.", "A digital flyer for an online webinar, professional layout.", "A promotional poster for a sale, bright eye-catching colors."] },
+    { id: 'ui-button', name: 'Button', category: 'Social Media', icon: <ButtonIcon />, prompts: ["A glossy 3D UI button, call to action, high quality render.", "A futuristic cyber button with neon glow effects.", "A clean minimalist download button, flat design."] },
 ];
 
 const CATEGORIES: MockupCategory[] = ['Apparel', 'Merchandise', 'Print', 'Signage'];
-const INSPIRATION_CATEGORIES: InspirationCategory[] = ['Characters', 'Places', 'Objects', 'Art'];
+const INSPIRATION_CATEGORIES: InspirationCategory[] = ['Characters', 'Places', 'Objects', 'Art', 'Social Media'];
 
 const STYLE_PRESETS = [
     'Abstract Art', 'Anime', 'Black and White', 'Claymation', 'Cyberpunk', 
@@ -328,7 +345,7 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio
 
   return (
     <div className="mb-4">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Aspect Ratio</label>
+        <label className="text-sm font-medium text-gray-900 dark:text-gray-300 mb-2 block">Aspect Ratio</label>
         <div className="space-y-3">
              {/* Landscape & Square */}
              <div>
@@ -338,7 +355,7 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio
                         <button
                             key={ratio}
                             onClick={() => onSelect(ratio)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${selectedRatio === ratio ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white dark:bg-dark-input text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${selectedRatio === ratio ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white dark:bg-dark-input text-gray-900 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                         >
                             {ratio}
                         </button>
@@ -354,7 +371,7 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio
                         <button
                             key={ratio}
                             onClick={() => onSelect(ratio)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${selectedRatio === ratio ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white dark:bg-dark-input text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${selectedRatio === ratio ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white dark:bg-dark-input text-gray-900 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                         >
                             {ratio}
                         </button>
@@ -366,7 +383,7 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio
             <div>
                  <button
                     onClick={() => onSelect('Custom')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${isCustomSelected ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white dark:bg-dark-input text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${isCustomSelected ? 'bg-brand-primary text-white border-brand-primary' : 'bg-white dark:bg-dark-input text-gray-900 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                 >
                     Custom
                 </button>
@@ -376,7 +393,7 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio
                             type="number" 
                             value={customDimensions.w} 
                             onChange={(e) => handleCustomChange(e, 'w')} 
-                            className="w-20 p-1 text-sm bg-white dark:bg-dark-input border border-gray-300 dark:border-gray-600 rounded" 
+                            className="w-20 p-1 text-sm bg-white dark:bg-dark-input border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-gray-100" 
                             placeholder="W" 
                         />
                         <span className="text-gray-500">:</span>
@@ -384,7 +401,7 @@ const AspectRatioSelector: React.FC<AspectRatioSelectorProps> = ({ selectedRatio
                             type="number" 
                             value={customDimensions.h} 
                             onChange={(e) => handleCustomChange(e, 'h')} 
-                            className="w-20 p-1 text-sm bg-white dark:bg-dark-input border border-gray-300 dark:border-gray-600 rounded" 
+                            className="w-20 p-1 text-sm bg-white dark:bg-dark-input border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-gray-100" 
                             placeholder="H" 
                         />
                     </div>
@@ -618,7 +635,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 <div className="space-y-6">
                     <div>
-                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Upload Your Logo</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">1. Upload Your Logo</h3>
                         <ImageUpload onImageUpload={handleLogoUpload} title="Your Logo (PNG, JPG)" imagePreviewUrl={logoPreview} id="mockup-upload" />
                         {logo && (
                             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -643,7 +660,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
                     </div>
                     
                     <div>
-                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">2. Settings</h3>
+                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">2. Settings</h3>
                          <AspectRatioSelector 
                             selectedRatio={aspectRatio} 
                             onSelect={(r) => setAspectRatio(r as AspectRatio)} 
@@ -654,7 +671,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
 
                     <div>
                          <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">3. Choose Mockups</h3>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200">3. Choose Mockups</h3>
                             <button
                                 onClick={handleSelectAllInCategory}
                                 className="text-sm font-medium text-brand-primary hover:text-brand-secondary transition-colors"
@@ -669,7 +686,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
                                 <button
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
-                                    className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-brand-primary text-white' : 'bg-gray-200 dark:bg-dark-card text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                                    className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-brand-primary text-white' : 'bg-gray-200 dark:bg-dark-card text-gray-900 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
                                 >
                                     {cat}
                                 </button>
@@ -679,7 +696,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-4">
                             {visibleMockups.map((opt) => (
                                 <button key={opt.id} onClick={() => handleMockupSelect(opt)}
-                                    className={`p-2 md:p-4 rounded-lg flex flex-col items-center justify-center text-center transition-all duration-200 ${selectedMockups.some(m => m.id === opt.id) ? 'bg-brand-primary text-white ring-2 ring-offset-2 ring-offset-white dark:ring-offset-dark-card ring-brand-primary' : 'bg-gray-100 dark:bg-dark-input hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+                                    className={`p-2 md:p-4 rounded-lg flex flex-col items-center justify-center text-center transition-all duration-200 ${selectedMockups.some(m => m.id === opt.id) ? 'bg-brand-primary text-white ring-2 ring-offset-2 ring-offset-white dark:ring-offset-dark-card ring-brand-primary' : 'bg-gray-100 dark:bg-dark-input hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-200'}`}>
                                     {opt.icon}
                                     <span className="mt-2 text-xs md:text-sm font-medium">{opt.name}</span>
                                 </button>
@@ -693,7 +710,7 @@ const MockupGenerator: React.FC<MockupGeneratorProps> = ({ initialImage, onTrans
 
                 <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">4. Results</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200">4. Results</h3>
                         {resultImages.length > 1 && (
                              <button
                                 onClick={handleDownloadAll}
@@ -980,9 +997,10 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
     return (
          <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                {/* LEFT COLUMN: UPLOAD & SETTINGS */}
                 <div className="space-y-6">
                     <div>
-                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Upload Image to Edit</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">1. Upload Image to Edit</h3>
                         {/* Image Preview with Text Overlay */}
                         <div className="relative group" ref={containerRef}>
                              <ImageUpload onImageUpload={handleImageUpload} title="Image to Edit (PNG, JPG)" imagePreviewUrl={imagePreviewUrl} id="editor-upload" />
@@ -1029,7 +1047,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                     </div>
                     
                     <div>
-                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">2. Settings</h3>
+                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">2. Settings</h3>
                          <AspectRatioSelector 
                             selectedRatio={aspectRatio} 
                             onSelect={(r) => setAspectRatio(r as AspectRatio)} 
@@ -1041,7 +1059,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                     {/* Add Text / Watermark Section */}
                     {image && (
                         <div className="p-4 bg-gray-50 dark:bg-dark-input rounded-lg border border-gray-200 dark:border-dark-border">
-                            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-300 mb-3 flex items-center">
                                 <TextIcon /> Add Text Overlay / Watermark
                             </h3>
                             <div className="flex gap-2 mb-2">
@@ -1050,7 +1068,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                                     value={newText} 
                                     onChange={(e) => setNewText(e.target.value)} 
                                     placeholder="Enter text..." 
-                                    className="flex-1 p-2 text-sm rounded bg-white dark:bg-dark-card border border-gray-300 dark:border-gray-600"
+                                    className="flex-1 p-2 text-sm rounded bg-white dark:bg-dark-card border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
                                 />
                                 <input 
                                     type="color" 
@@ -1120,22 +1138,37 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                             </p>
                         </div>
                     )}
+                </div>
+
+                {/* RIGHT COLUMN: RESULTS, DESCRIPTION, & STYLES */}
+                <div className="space-y-6">
+                    <div className="space-y-2">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200">3. Result</h3>
+                        <GeneratedImageDisplay imageUrl={resultImage} isLoading={isLoading} altText="Edited image" />
+                        {resultImage && !isLoading && (
+                            <div className="mt-2 flex gap-2">
+                                <button onClick={() => onTransfer({ base64: resultImage, mimeType: 'image/png' }, 'mockup')} className="flex-1 flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 rounded-lg transition-colors text-sm">
+                                    <TransferIcon /> Use as Logo
+                                </button>
+                            </div>
+                        )}
+                    </div>
 
                     <div>
-                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">3. Describe Your Edit</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">4. Describe Your Edit</h3>
                         <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="e.g., 'Add a retro filter' or 'Make the sky look like a sunset'"
-                            className="w-full h-24 p-2 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition"
+                            className="w-full h-24 p-2 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition text-gray-900 dark:text-gray-100"
                         />
                          {/* Style Presets */}
                          <div className="mt-4">
-                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Quick Styles</label>
-                            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                            <label className="text-xs font-semibold text-gray-900 dark:text-gray-500 uppercase tracking-wider mb-2 block">Quick Styles</label>
+                            <div className="flex flex-wrap gap-2">
                                 {STYLE_PRESETS.map(style => (
                                     <button
                                         key={style}
                                         type="button"
                                         onClick={() => handleAddStyle(style)}
-                                        className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-dark-card text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors border border-transparent"
+                                        className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-dark-card text-gray-900 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors border border-transparent"
                                     >
                                         {style}
                                     </button>
@@ -1146,18 +1179,6 @@ const ImageEditor: React.FC<ImageEditorProps> = ({ initialImage, onTransfer, onA
                     <button onClick={handleSubmit} disabled={isLoading || !image || !prompt} className="w-full bg-brand-primary hover:bg-brand-secondary text-white font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
                         {isLoading ? 'Editing...' : 'Apply Edit'}
                     </button>
-                </div>
-
-                <div className="space-y-2">
-                    <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">4. Result</h3>
-                    <GeneratedImageDisplay imageUrl={resultImage} isLoading={isLoading} altText="Edited image" />
-                     {resultImage && !isLoading && (
-                         <div className="mt-2 flex gap-2">
-                             <button onClick={() => onTransfer({ base64: resultImage, mimeType: 'image/png' }, 'mockup')} className="flex-1 flex items-center justify-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-3 rounded-lg transition-colors text-sm">
-                                <TransferIcon /> Use as Logo
-                            </button>
-                         </div>
-                    )}
                 </div>
             </div>
             {isCropping && image && (
@@ -1178,6 +1199,7 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
     const [isEnhancing, setIsEnhancing] = useState(false);
     const [error, setError] = useState<ErrorDetails | null>(null);
     const [resultImage, setResultImage] = useState<string | null>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     
     // Inspiration State
     const [activeInspirationCategory, setActiveInspirationCategory] = useState<InspirationCategory>('Characters');
@@ -1186,6 +1208,19 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
     // Aspect Ratio State
     const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
     const [customDims, setCustomDims] = useState({ w: 1024, h: 1024 });
+
+    // Auto-resize textarea logic
+    const adjustTextareaHeight = useCallback(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto'; // Reset height
+            textarea.style.height = `${Math.max(textarea.scrollHeight, 128)}px`; // Set to scrollHeight, min 128px (approx h-32)
+        }
+    }, []);
+
+    useEffect(() => {
+        adjustTextareaHeight();
+    }, [prompt, adjustTextareaHeight]);
 
     const handleSurpriseMe = () => {
         let pool: string[] = [];
@@ -1261,7 +1296,7 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-6">
                     <div>
-                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">1. Need Inspiration? (Optional)</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">1. Need Inspiration? (Optional)</h3>
                         <p className="text-xs text-gray-500 mb-3">Select items below to steer the "Inspire Me" button towards specific topics.</p>
                         
                         {/* Inspiration Tabs */}
@@ -1270,7 +1305,7 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
                                 <button
                                     key={cat}
                                     onClick={() => setActiveInspirationCategory(cat)}
-                                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${activeInspirationCategory === cat ? 'bg-brand-primary text-white' : 'bg-gray-200 dark:bg-dark-card text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${activeInspirationCategory === cat ? 'bg-brand-primary text-white' : 'bg-gray-200 dark:bg-dark-card text-gray-900 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
                                 >
                                     {cat}
                                 </button>
@@ -1283,7 +1318,7 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
                                 <button 
                                     key={opt.id} 
                                     onClick={() => toggleInspiration(opt.id)}
-                                    className={`p-2 rounded-lg flex flex-col items-center justify-center text-center transition-all duration-200 aspect-square ${selectedInspirations.includes(opt.id) ? 'bg-brand-primary text-white ring-2 ring-offset-1 ring-brand-primary' : 'bg-gray-100 dark:bg-dark-input hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                                    className={`p-2 rounded-lg flex flex-col items-center justify-center text-center transition-all duration-200 aspect-square ${selectedInspirations.includes(opt.id) ? 'bg-brand-primary text-white ring-2 ring-offset-1 ring-brand-primary' : 'bg-gray-100 dark:bg-dark-input hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-200'}`}
                                 >
                                     {opt.icon}
                                     <span className="mt-1 text-[10px] leading-tight font-medium truncate w-full">{opt.name}</span>
@@ -1293,7 +1328,7 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
                     </div>
                     
                     <div>
-                         <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">2. Settings</h3>
+                         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">2. Settings</h3>
                          <AspectRatioSelector 
                             selectedRatio={aspectRatio} 
                             onSelect={(r) => setAspectRatio(r as AspectRatio)} 
@@ -1303,20 +1338,14 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">3. Describe Your Vision</h3>
-                        <div className="relative">
-                            <textarea 
-                                value={prompt} 
-                                onChange={(e) => setPrompt(e.target.value)} 
-                                placeholder="A futuristic city with flying cars..."
-                                className="w-full h-32 p-3 pb-12 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition resize-none"
-                            />
-                            <div className="absolute bottom-2 right-2 flex gap-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200">3. Describe Your Vision</h3>
+                            <div className="flex gap-2">
                                 <button 
                                     type="button" 
                                     onClick={handleEnhancePrompt}
                                     disabled={isEnhancing || !prompt.trim()}
-                                    className="text-xs px-3 py-1.5 rounded transition-all flex items-center font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50 disabled:opacity-50"
+                                    className="text-xs px-3 py-1.5 rounded transition-all flex items-center font-medium bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-200 disabled:opacity-50"
                                     title="Rewrites your prompt to add more detail and style"
                                 >
                                     <SparklesIcon /> 
@@ -1325,12 +1354,21 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
                                 <button 
                                     type="button" 
                                     onClick={handleSurpriseMe}
-                                    className={`text-xs px-3 py-1.5 rounded transition-all flex items-center font-medium ${selectedInspirations.length > 0 ? 'bg-brand-secondary text-white hover:bg-opacity-90' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'}`}
+                                    className={`text-xs px-3 py-1.5 rounded transition-all flex items-center font-medium ${selectedInspirations.length > 0 ? 'bg-brand-secondary text-white hover:bg-opacity-90' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-200'}`}
                                 >
                                     <LightBulbIcon /> 
                                     {selectedInspirations.length > 0 ? `Inspire Me (${selectedInspirations.length})` : 'Inspire Me'}
                                 </button>
                             </div>
+                        </div>
+                        <div className="relative">
+                            <textarea 
+                                ref={textareaRef}
+                                value={prompt} 
+                                onChange={(e) => setPrompt(e.target.value)} 
+                                placeholder="A futuristic city with flying cars..."
+                                className="w-full min-h-[8rem] p-3 bg-gray-50 dark:bg-dark-input border border-gray-300 dark:border-dark-border rounded-lg focus:ring-brand-primary focus:border-brand-primary transition resize-none text-gray-900 dark:text-gray-100 overflow-hidden"
+                            />
                         </div>
                     </div>
                     
@@ -1340,7 +1378,7 @@ const ImageGenerator: React.FC<{ onAddToHistory: (item: Omit<HistoryItem, 'id' |
                 </div>
 
                 <div className="space-y-2">
-                    <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">4. Result</h3>
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-200">4. Result</h3>
                     <GeneratedImageDisplay imageUrl={resultImage} isLoading={isLoading} altText={prompt} />
                      {resultImage && !isLoading && (
                         <div className="grid grid-cols-2 gap-2 mt-2">
@@ -1466,16 +1504,16 @@ const App: React.FC = () => {
                         </h1>
                     </div>
                     <div className="flex items-center space-x-4">
-                        <button onClick={cycleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300" title={`Change Theme (Current: ${THEMES[currentThemeIndex].name})`}>
+                        <button onClick={cycleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-gray-300" title={`Change Theme (Current: ${THEMES[currentThemeIndex].name})`}>
                             <PaletteIcon />
                         </button>
-                         <button onClick={() => setIsHistoryOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300" title="History">
+                         <button onClick={() => setIsHistoryOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-gray-300" title="History">
                             <HistoryIcon />
                         </button>
-                        <button onClick={() => setIsHelpOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300" title="Help">
+                        <button onClick={() => setIsHelpOpen(true)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-gray-300" title="Help">
                             <HelpIcon />
                         </button>
-                        <button onClick={toggleDarkMode} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300" title="Toggle Dark Mode">
+                        <button onClick={toggleDarkMode} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-900 dark:text-gray-300" title="Toggle Dark Mode">
                             {isDarkMode ? <SunIcon /> : <MoonIcon />}
                         </button>
                     </div>
@@ -1487,19 +1525,19 @@ const App: React.FC = () => {
                 <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-8 bg-gray-200 dark:bg-dark-input p-1 rounded-xl w-fit mx-auto">
                      <button
                         onClick={() => setActiveTab('generator')}
-                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex-1 sm:flex-none text-center ${activeTab === 'generator' ? 'bg-white dark:bg-dark-card text-brand-primary shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex-1 sm:flex-none text-center ${activeTab === 'generator' ? 'bg-white dark:bg-dark-card text-brand-primary shadow-sm' : 'text-gray-800 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                     >
-                        Generative AI
+                        Generate Image
                     </button>
                      <button
                         onClick={() => setActiveTab('editor')}
-                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex-1 sm:flex-none text-center ${activeTab === 'editor' ? 'bg-white dark:bg-dark-card text-brand-primary shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex-1 sm:flex-none text-center ${activeTab === 'editor' ? 'bg-white dark:bg-dark-card text-brand-primary shadow-sm' : 'text-gray-800 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                     >
                         Image Editor
                     </button>
                     <button
                         onClick={() => setActiveTab('mockup')}
-                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex-1 sm:flex-none text-center ${activeTab === 'mockup' ? 'bg-white dark:bg-dark-card text-brand-primary shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 flex-1 sm:flex-none text-center ${activeTab === 'mockup' ? 'bg-white dark:bg-dark-card text-brand-primary shadow-sm' : 'text-gray-800 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'}`}
                     >
                         Mockup Studio
                     </button>
@@ -1509,24 +1547,24 @@ const App: React.FC = () => {
                 <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl p-6 md:p-8 transition-colors border border-gray-100 dark:border-gray-800 min-h-[600px]">
                     <div style={{ display: activeTab === 'generator' ? 'block' : 'none' }}>
                          <div className="mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">AI Image Generator</h2>
-                            <p className="text-gray-500 dark:text-gray-400">Turn text into high-quality images.</p>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">AI Image Generator</h2>
+                            <p className="text-gray-600 dark:text-gray-400">Turn text into high-quality images.</p>
                         </div>
                         <ImageGenerator onAddToHistory={addToHistory} onTransfer={handleTransfer} />
                     </div>
 
                     <div style={{ display: activeTab === 'editor' ? 'block' : 'none' }}>
                         <div className="mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">AI Image Editor</h2>
-                            <p className="text-gray-500 dark:text-gray-400">Upload an image and modify it with natural language.</p>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">AI Image Editor</h2>
+                            <p className="text-gray-600 dark:text-gray-400">Upload an image and modify it with natural language.</p>
                         </div>
                         <ImageEditor initialImage={getInitialImageForTab('editor')} onTransfer={handleTransfer} onAddToHistory={addToHistory} />
                     </div>
 
                     <div style={{ display: activeTab === 'mockup' ? 'block' : 'none' }}>
                          <div className="mb-6">
-                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Mockup Studio</h2>
-                            <p className="text-gray-500 dark:text-gray-400">Place your logo on realistic products.</p>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Mockup Studio</h2>
+                            <p className="text-gray-600 dark:text-gray-400">Place your logo on realistic products.</p>
                         </div>
                         <MockupGenerator initialImage={getInitialImageForTab('mockup')} onTransfer={handleTransfer} onAddToHistory={addToHistory} />
                     </div>
