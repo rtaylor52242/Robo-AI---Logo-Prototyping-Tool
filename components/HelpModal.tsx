@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 
 interface HelpModalProps {
@@ -58,41 +57,36 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
 
         <div className="space-y-8 text-gray-600 dark:text-gray-300">
           <section>
-            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">1. Generate Image</h3>
-             <ol className="list-decimal list-inside space-y-2">
-              <li><strong>Visual Inspiration:</strong> Select categories like Characters, Places, or Objects to guide the <strong>Inspire Me</strong> button towards specific themes.</li>
-              <li><strong>Describe Your Vision:</strong> Write a detailed prompt or let the AI surprise you.</li>
-              <li><strong>Aspect Ratio:</strong> Choose from Portrait, Landscape, Square, or Custom dimensions for your generated image.</li>
-              <li><strong>Generate:</strong> Create high-quality AI images from scratch.</li>
-            </ol>
-          </section>
-
-          <section>
-            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">2. Image Editor</h3>
-            <ol className="list-decimal list-inside space-y-2">
-              <li><strong>Upload Image:</strong> Upload or capture an image you want to modify.</li>
-              <li><strong>Describe Your Edit:</strong> Type instructions like "Make it sunset" or click the <strong>Quick Style</strong> buttons (e.g., Cyberpunk, Watercolor) to apply presets.</li>
-              <li><strong>Settings:</strong> You can also adjust the aspect ratio for the resulting edited image.</li>
-              <li><strong>Apply Edit:</strong> The AI will regenerate your image with the requested changes.</li>
-            </ol>
-          </section>
-
-          <section>
-            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">3. Mockup Studio</h3>
+            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">Logo on Mockup</h3>
             <ol className="list-decimal list-inside space-y-2">
               <li><strong>Upload Your Logo:</strong> Upload a file or use the <strong>Take Photo</strong> button to capture an image using your webcam.</li>
-              <li><strong>Fine-Tune:</strong> Use 'Remove Background' for cleaner logos or 'Mirror Image' to flip the design horizontally.</li>
-              <li><strong>Settings:</strong> Select the aspect ratio for the final mockup image.</li>
+              <li><strong>Fine-Tune (Optional):</strong> Use 'Remove Background' for cleaner logos or 'Mirror Image' to flip the design horizontally.</li>
               <li><strong>Choose Mockups:</strong> Select from categories like Apparel, Merchandise, Print, and Signage. Use the tabs to filter categories.</li>
               <li><strong>Generate:</strong> Click 'Create Mockup(s)' to generate realistic product images.</li>
             </ol>
           </section>
 
           <section>
-            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">History, Sharing & Tools</h3>
+            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">Image Editor</h3>
+            <ol className="list-decimal list-inside space-y-2">
+              <li><strong>Upload Image:</strong> Upload or capture an image you want to modify.</li>
+              <li><strong>Describe Your Edit:</strong> Type instructions like "Make it sunset" or click the <strong>Quick Style</strong> buttons (e.g., Cyberpunk, Watercolor) to apply presets.</li>
+              <li><strong>Apply Edit:</strong> The AI will regenerate your image with the requested changes.</li>
+            </ol>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">Generate Image</h3>
+             <ol className="list-decimal list-inside space-y-2">
+              <li><strong>Describe Your Vision:</strong> Write a prompt or use the <strong>Inspire Me</strong> button for a random creative idea.</li>
+              <li><strong>Generate:</strong> Create high-quality AI images from scratch.</li>
+            </ol>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-semibold text-brand-primary dark:text-brand-secondary mb-3">History & Sharing</h3>
              <ul className="list-disc list-inside space-y-2">
-              <li><strong>History Log:</strong> Click the clock icon to view past generations. You can <strong>Delete</strong> items, transfer them between tools, or view details.</li>
-              <li><strong>Deep Zoom:</strong> Click any image to open full-screen. Use your mouse wheel to zoom in/out and drag to pan around details.</li>
+              <li><strong>History Log:</strong> Click the clock icon in the top right to view all your past generations. You can zoom in on images or re-use them in the Editor/Mockup tools.</li>
               <li><strong>Advanced Share:</strong> Click the 'Share' button on any generated image to send it to social apps, copy it to your clipboard, or download it.</li>
             </ul>
           </section>
